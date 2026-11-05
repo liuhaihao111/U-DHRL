@@ -1,0 +1,217 @@
+{
+  "version": "V26.0-unified-schema-driven-nine-dataset-protocol",
+  "source": ".",
+  "v7": ".",
+  "datasets": [
+    "BPIC13_C",
+    "BPIC13_I",
+    "BPIC13_O",
+    "BPIC15_1",
+    "BPIC15_2",
+    "BPIC15_3",
+    "BPIC15_4",
+    "BPIC15_5",
+    "Receipt"
+  ],
+  "seeds": [
+    42,
+    123,
+    456,
+    789,
+    2024
+  ],
+  "baselines": [
+    "Naive",
+    "DAE",
+    "BINet",
+    "GRASPED",
+    "TranAD"
+  ],
+  "policies": [
+    "U-DHRL-V16"
+  ],
+  "controls": [],
+  "primary_rates": [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45
+  ],
+  "extra_rates": [
+    1,
+    2
+  ],
+  "learning_rates": [
+    0.001,
+    0.0003
+  ],
+  "policy_epochs": 100,
+  "policy_patience": 6,
+  "batch_size": 128,
+  "target_every": 100,
+  "gamma": 0.95,
+  "refine_cost": 0.02,
+  "ambiguity_weight": 0.04,
+  "ranking_weight": 0.03,
+  "quantile": 0.95,
+  "teacher_winsor": [
+    0.005,
+    0.995
+  ],
+  "job_timeout_seconds": 86400,
+  "primary_candidate": "U-DHRL",
+  "primary_track": "method_decision",
+  "tracks": [
+    "method_decision",
+    "common_unlabeled_q95"
+  ],
+  "full_reward_weight": 0.1,
+  "high_return_mix": 0.5,
+  "modal_uncertainty_z": 2.0,
+  "warm_start": false,
+  "length_local_weight_max": 0.65,
+  "length_correlation_floor": 0.2,
+  "evidence_correction_fraction": 0.1,
+  "threshold_bootstrap_repeats": 24,
+  "threshold_bootstrap_quantile": 0.75,
+  "threshold_max_tail_trim": 0.025,
+  "calibration_min_cases": 12,
+  "calibration_min_boundary_cases": 4,
+  "calibration_boundary_fraction": 1.0,
+  "calibration_shrinkage_cases": 24,
+  "calibration_max_offset": 0.5,
+  "calibration_min_relative_gain": 0.01,
+  "representation_epochs": 80,
+  "representation_patience": 6,
+  "representation_learning_rates": [
+    0.001,
+    0.0003
+  ],
+  "representation_mix_grid": [
+    0.0,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "representation_min_gain": 0.01,
+  "context_hidden": 64,
+  "context_dropout": 0.1,
+  "context_logit_bound": 8.0,
+  "context_weight_decay": 0.0001,
+  "v11": ".",
+  "reference_shrinkage": 32.0,
+  "background_ridge": 10.0,
+  "background_residual_mix": 0.5,
+  "coarse_tail_budget": 0.25,
+  "fine_tail_budget": 0.2,
+  "local_margin_weight": 0.3,
+  "fine_disagreement_weight": 0.06,
+  "v12": ".",
+  "final_reference_tail_budget": 0.15,
+  "tranad_learning_rates": [
+    0.0001,
+    3e-05
+  ],
+  "tranad_epochs": 50,
+  "tranad_patience": 8,
+  "activity_min_cases": 8,
+  "activity_correction_mix": 0.5,
+  "activity_shrinkage_cases": 32.0,
+  "activity_correction_cap_fraction": 0.5,
+  "activity_min_relative_gain": 0.01,
+  "v13": ".",
+  "masked_learning_rates": [
+    0.0001,
+    3e-05
+  ],
+  "masked_epochs": 60,
+  "masked_patience": 6,
+  "masked_phases": 4,
+  "masked_clean_weight": 0.5,
+  "masked_kl_weight": 0.01,
+  "masked_anchor_weight": 0.1,
+  "masked_min_relative_gain": 0.01,
+  "masked_clean_tolerance": 0.01,
+  "masked_evidence_weight": 0.3,
+  "policy_advantage_weight": 0.5,
+  "policy_boundary_weight": 0.05,
+  "policy_validation_sign_weight": 0.1,
+  "policy_validation_route_weight": 1.0,
+  "v14": ".",
+  "paper_reward_beta": 1.0,
+  "paper_reward_lambda": 0.15,
+  "paper_reward_scale_floor": 0.1,
+  "high_return_definition": "binary projection of internal reward; conditional subtype reward stays low-level",
+  "v15": ".",
+  "tail_evidence_weight": 0.25,
+  "tail_evidence_shrinkage_cases": 32.0,
+  "tail_evidence_scale_floor": 0.1,
+  "v16": ".",
+  "arms": [
+    "final"
+  ],
+  "base_epochs": 50,
+  "base_patience": 8,
+  "base_learning_rates": [
+    0.001,
+    0.0003
+  ],
+  "base_batch": 64,
+  "representation_seed_offset": 22000,
+  "execution_order": [
+    "BPIC13_C",
+    "BPIC13_I",
+    "BPIC13_O",
+    "BPIC15_1",
+    "BPIC15_2",
+    "BPIC15_3",
+    "BPIC15_4",
+    "BPIC15_5",
+    "Receipt"
+  ],
+  "models": [
+    "TranAD",
+    "U-DHRL",
+    "GRASPED",
+    "DAE",
+    "BINet",
+    "Naive"
+  ],
+  "baseline_epochs": 50,
+  "baseline_patience": 8,
+  "baseline_batch": 64,
+  "baseline_learning_rates": {
+    "DAE": [
+      0.0001,
+      0.0003
+    ],
+    "BINet": [
+      0.001,
+      0.0003
+    ],
+    "GRASPED": [
+      0.001,
+      0.0003
+    ]
+  },
+  "baseline_threshold": "training 3-means lower midpoint, or q95 when fewer than 3 distinct scores",
+  "v22": ".",
+  "experiment": "Unified schema-driven nine-dataset protocol. The same timestamp-tie rule is applied to every log; each training split chooses activity+lifecycle tokens only when lifecycle coverage is complete and has at least two states, otherwise activity tokens. Vocabulary and fitting inputs come only from the training split, with identity fitting indices for every dataset. U-DHRL, rewards, clustering thresholds, models, budgets and evaluation remain unchanged; all six methods retrain from scratch.",
+  "v23": ".",
+  "expected_jobs": 270,
+  "parent": ".",
+  "reference_roots": [],
+  "v25_reference": ".",
+  "preprocessing_seed_offset": 24024,
+  "preprocessing_rule": {
+    "event_order": "Within the observed first 50 events, a same-timestamp group is stably sorted by action_code only when every event in that group has a nonempty action_code; otherwise source order is preserved.",
+    "representation": "Use activity+lifecycle only when every training event has a nonempty lifecycle:transition and the training split contains at least two distinct lifecycle states; otherwise use activity.",
+    "vocabulary": "Training split only.",
+    "fit_sampling": "Identity indices for every dataset."
+  }
+}

@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+runs/
+*.pt
+*.pth
+*.pkl
+*.npz
+*.npy
+*.xes
+*.xes.gz
+*.log
+logs.local.json
