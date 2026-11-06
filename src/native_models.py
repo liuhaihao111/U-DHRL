@@ -221,4 +221,3 @@ class TranAD(nn.Module):
 
 
 FACTORIES = {'VAE': VAE, 'DAE': DAE, 'BINet': BINet, 'GRASPED': GRASPED, 'TranAD': TranAD}
-

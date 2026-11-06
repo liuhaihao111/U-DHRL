@@ -1,7 +1,7 @@
-"""Reconstruction evidence for V14; fit on original train/validation only."""
+"""Reconstruction evidence for masked; fit on original train/validation only."""
 import numpy as np
 from common import CFG
-from evidence_v12 import EvidenceV12, _Background, _width, local_surprise
+from evidence_background import BackgroundEvidence, _Background, _width, local_surprise
 
 
 def masked_pack(p):
@@ -9,11 +9,11 @@ def masked_pack(p):
                 stats=p['masked_stats'],native=p['masked_native'])
 
 
-class EvidenceV14:
+class MaskedEvidence:
     def fit(self, train, validation, seed, masked_enabled):
         assert not any(k in p for p in (train,validation) for k in ('y','labels','y_three','test'))
-        # Restore the V12 entropy-excess evidence, with calibration kept separate.
-        self.clean=EvidenceV12().fit(train,validation,seed)
+        # Restore the background entropy-excess evidence, with calibration kept separate.
+        self.clean=BackgroundEvidence().fit(train,validation,seed)
         self.clean.threshold_diagnostics['reference']='original validation only; unlabeled'
         self.compat=self.clean.compat;self.centers=self.clean.centers;self.sigma=self.clean.sigma
         self.masked_enabled=bool(masked_enabled)

@@ -1,4 +1,4 @@
-"""Existing V16 baseline architectures and fit rules, trained equally per arm."""
+"""Existing hierarchical baseline architectures and fit rules, trained equally per arm."""
 import time,collections,pickle
 import numpy as np
 import torch

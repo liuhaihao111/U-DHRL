@@ -1,14 +1,14 @@
-"""Frozen V26 two-stage inference: only fine routes acquire local evidence."""
+"""Frozen unified two-stage inference: only fine routes acquire local evidence."""
 import numpy as np
 import torch
 from torch.nn import functional as F
 from torch.nn.utils.rnn import pack_padded_sequence
 from representation import robust_apply
-from evidence_v15 import membership_terms
+from evidence_reward import membership_terms
 from masked_vae import masked_logits
-from tail_v16 import _legacy_statistics, _view_pack, categorical_tail, _tail_statistics
+from tail_features import _legacy_statistics, _view_pack, categorical_tail, _tail_statistics
 from policy import mask_q, coarse_fine_advantage
-from policy_v16 import coarse_prior
+from policy_hierarchical import coarse_prior
 
 
 def clean_stage(model, tokens, device):
@@ -28,9 +28,9 @@ def clean_stage(model, tokens, device):
 
 
 def global_stage(evidence, p):
-    # Reproduce each original float32 cast, including the frozen V15 prior.
+    # Reproduce each original float32 cast, including the frozen reward prior.
     assert evidence.mode == 'optimized'
-    base = evidence.frozen_v15
+    base = evidence.frozen_reward
     reference = base.reference
     compat = reference.compat
     g = np.column_stack((robust_apply(compat.global_raw(p), compat.global_fit),
@@ -47,7 +47,7 @@ def global_stage(evidence, p):
     weights /= weights.sum(1, keepdims=True)
     m, effective, _ = membership_terms(weights)
     g = np.column_stack((g, 3*m, 3*effective)).astype(np.float32)
-    # Original V14 casts cm before V15 distance; V16 does not replace this scale.
+    # Original masked casts cm before reward distance; hierarchical does not replace this scale.
     prior = base.distance(cm.astype(np.float32)).astype(np.float32)
     return g, prior
 

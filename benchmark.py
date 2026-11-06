@@ -9,7 +9,7 @@ def main():
  torch.set_num_threads(2)
  work=a.run.resolve();sys.path.insert(0,str(work/'src'))
  from job import load_ours
- from tail_v16 import extract_tail_views
+ from tail_features import extract_tail_views
  from inference_lazy import predict
  from common import metric
  load=torch.load

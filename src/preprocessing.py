@@ -1,4 +1,4 @@
-"""Schema-driven event preprocessing for the unified V26 protocol."""
+"""Schema-driven event preprocessing for the unified unified protocol."""
 import collections
 import gzip
 import json

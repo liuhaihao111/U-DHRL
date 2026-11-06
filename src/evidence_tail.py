@@ -1,6 +1,6 @@
-"""Bounded same-VAE tail correction of frozen V15 fine reconstruction evidence.
+"""Bounded same-VAE tail correction of frozen reward fine reconstruction evidence.
 
-The V15 internal/external reward equations, distance function and raw-reward
+The reward internal/external reward equations, distance function and raw-reward
 ablation are inherited without overrides.  Only the fine evidence and its
 reward scale change.  Coarse inputs, coarse reconstruction prior, VAE weights,
 latent memberships and all historical reference outputs remain unchanged.
@@ -14,8 +14,8 @@ import copy
 import numpy as np
 
 from common import CFG
-from evidence_v12 import _Background
-from evidence_v15 import EvidenceV15
+from evidence_background import _Background
+from evidence_reward import RewardEvidence
 
 
 def _width(values, floor):
@@ -33,17 +33,17 @@ def bounded_tail_correction(old_margin, tail_margin, rho, cap):
     return old_margin + correction, correction
 
 
-class EvidenceV16(EvidenceV15):
+class TailEvidence(RewardEvidence):
     def fit(self, reference, train, validation, seed):
-        """Fit original-validation tail background with frozen V15 as reference.
+        """Fit original-validation tail background with frozen reward as reference.
 
         No anomaly labels, test scores, baseline outputs or injection rates are
         accepted.  The 0.25 maximum weight is fixed before benchmark inspection.
-        n/(n+32) shrinks a sparse fitted reference towards unchanged V15; it is
+        n/(n+32) shrinks a sparse fitted reference towards unchanged reward; it is
         a regularization heuristic, not a confidence bound or a retention
-        guarantee.  The cap is one original-V15 reference Q90-Q10 width.
+        guarantee.  The cap is one original-reward reference Q90-Q10 width.
         """
-        assert type(reference) is EvidenceV15 and reference.mode == 'optimized'
+        assert type(reference) is RewardEvidence and reference.mode == 'optimized'
         assert not any(k in p for p in (train, validation)
                        for k in ('y', 'labels', 'y_three', 'test'))
         assert len(train['length']) >= 3 and len(validation['length']) >= 3
@@ -51,7 +51,7 @@ class EvidenceV16(EvidenceV15):
         # calling it during transform rather than recomputing the prior with
         # the new fine reward scale.
         self.__dict__ = reference.__dict__.copy()
-        self.frozen_v15 = reference
+        self.frozen_reward = reference
         self.reward_diagnostics = copy.deepcopy(reference.reward_diagnostics)
         self.threshold_diagnostics = copy.deepcopy(reference.threshold_diagnostics)
         self.optimization_diagnostics = copy.deepcopy(reference.optimization_diagnostics)
@@ -89,14 +89,14 @@ class EvidenceV16(EvidenceV15):
             categorical_tail_is_anomaly_p_value=False,
             target_visibility='same frozen VAE target-hidden view when enabled; otherwise clean reconstruction',
             background=self.tail_background.diagnostics,
-            background_modes='frozen V14 latent modes; training-fitted centers',
-            background_groups='frozen V14 training length-bin edges',
+            background_modes='frozen masked latent modes; training-fitted centers',
+            background_groups='frozen masked training length-bin edges',
             cutoff=cutoff_info, tail_x=float(self.tail_x), tail_y=float(self.tail_y),
             tail_scale=float(self.tail_scale),
             fixed_maximum_weight=float(self.tail_weight),
             shrinkage_cases=float(self.tail_shrinkage_cases), effective_weight=float(self.tail_rho),
             shrinkage_rule='weight * validation_cases / (validation_cases + shrinkage_cases)',
-            cap=float(self.tail_cap), cap_units='original V15 validation fine-margin Q90-Q10, floored',
+            cap=float(self.tail_cap), cap_units='original reward validation fine-margin Q90-Q10, floored',
             maximum_absolute_correction=float(self.tail_rho*self.tail_cap),
             observed_maximum_absolute_correction=float(np.max(np.abs(correction))),
             correction_formula='rho * clip(tail_margin - old_fine_margin, -cap, +cap)',
@@ -112,9 +112,9 @@ class EvidenceV16(EvidenceV15):
             x=float(self.x), y=float(self.y), anomaly_boundary_unchanged=True,
             severity_boundary_unchanged=True,
             severity_boundary_limitation='old numerical y retained; corrected margin is not ground-truth severity',
-            globals_and_coarse_prior='frozen V15 arithmetic, including original coarse reward scale',
+            globals_and_coarse_prior='frozen reward arithmetic, including original coarse reward scale',
             new_local_features=['asinh(tail_margin)', 'asinh(tail_correction)'],
-            internal_external_reward_equations='inherited V15 without overrides',
+            internal_external_reward_equations='inherited reward without overrides',
             fine_reward_scale_reestimated=True,
             no_post_policy_score_override=True,
             no_new_detector_or_model_parameters=True,
@@ -130,16 +130,16 @@ class EvidenceV16(EvidenceV15):
                 'A preserved coarse prior may require residual adjustment to the new fine reward scale.',
                 'Repeatedly studied historical benchmarks remain exploratory evidence.'
             ])
-        self.threshold_diagnostics['v16_tail_correction'] = self.tail_diagnostics
-        self.optimization_diagnostics['v16_tail_correction'] = self.tail_diagnostics
+        self.threshold_diagnostics['tail_correction'] = self.tail_diagnostics
+        self.optimization_diagnostics['tail_correction'] = self.tail_diagnostics
         self.reward_diagnostics.update(
-            delta='frozen V15 fine margin plus bounded same-VAE categorical-tail correction; x/y unchanged',
+            delta='frozen reward fine margin plus bounded same-VAE categorical-tail correction; x/y unchanged',
             scale_reference='corrected original unlabeled validation Q90-Q10',
-            v16_reward_equations_unchanged=True,
-            v16_tail_source=self.tail_source,
-            v16_effective_tail_weight=float(self.tail_rho),
-            v16_maximum_absolute_correction=float(self.tail_rho*self.tail_cap),
-            coarse_prior_uses_frozen_v15_scale=True)
+            reward_equations_unchanged=True,
+            tail_feature_source=self.tail_source,
+            effective_tail_weight=float(self.tail_rho),
+            maximum_absolute_tail_correction=float(self.tail_rho*self.tail_cap),
+            coarse_prior_uses_frozen_reward_scale=True)
         return self
 
     def _tail_raw(self, p):
@@ -150,8 +150,8 @@ class EvidenceV16(EvidenceV15):
 
     def transform(self, p):
         # raw() is inherited unchanged: it selects original linear distances
-        # and original minimum membership, while sharing V16 corrected evidence.
-        base = self.frozen_v15.raw() if self.mode == 'paper_raw' else self.frozen_v15
+        # and original minimum membership, while sharing hierarchical corrected evidence.
+        base = self.frozen_reward.raw() if self.mode == 'paper_raw' else self.frozen_reward
         result = base.transform(p)
         modes = self.reference.clean._modes(p)
         tail_score = self.tail_background.transform(self._tail_raw(p), p['length'], modes)
@@ -162,7 +162,7 @@ class EvidenceV16(EvidenceV15):
         disagreement = np.tanh(np.abs(corrected - result['coarse_margin'])).astype(np.float32)
         extra = result['extra'].copy()
         assert extra.shape[1] >= 5
-        # V14's last five local fields are cm, fm, lm, masked margin, disagreement.
+        # masked's last five local fields are cm, fm, lm, masked margin, disagreement.
         extra[:, -4] = np.arcsinh(corrected).astype(np.float32)
         extra[:, -1] = disagreement
         result['extra'] = np.column_stack((extra, np.arcsinh(tail_margin),
@@ -189,10 +189,10 @@ def selfcheck():
     assert np.array_equal(identity, old) and np.array_equal(zero, np.zeros_like(old))
     unchanged, zero = bounded_tail_correction(old, old, .25, 1.)
     assert np.array_equal(unchanged, old) and np.array_equal(zero, np.zeros_like(old))
-    assert EvidenceV16.rewards is EvidenceV15.rewards
-    assert EvidenceV16.external is EvidenceV15.external
-    assert EvidenceV16.distance is EvidenceV15.distance
-    assert EvidenceV16.raw is EvidenceV15.raw
+    assert TailEvidence.rewards is RewardEvidence.rewards
+    assert TailEvidence.external is RewardEvidence.external
+    assert TailEvidence.distance is RewardEvidence.distance
+    assert TailEvidence.raw is RewardEvidence.raw
     return dict(ok=True, generated_arrays_only=True, correction_bounded=True,
                 symmetric_boundary_changes=True, far_from_boundary_signs_preserved=True,
                 zero_weight_exact_identity=True, original_reward_methods_inherited=True)

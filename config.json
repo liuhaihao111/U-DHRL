@@ -1,7 +1,7 @@
 {
-  "version": "V26.0-unified-schema-driven-nine-dataset-protocol",
+  "version": "unified-schema-driven-nine-dataset-protocol",
   "source": ".",
-  "v7": ".",
+  "base_source": ".",
   "datasets": [
     "BPIC13_C",
     "BPIC13_I",
@@ -28,7 +28,7 @@
     "TranAD"
   ],
   "policies": [
-    "U-DHRL-V16"
+    "U-DHRL"
   ],
   "controls": [],
   "primary_rates": [
@@ -103,7 +103,7 @@
   "context_dropout": 0.1,
   "context_logit_bound": 8.0,
   "context_weight_decay": 0.0001,
-  "v11": ".",
+  "calibration_source": ".",
   "reference_shrinkage": 32.0,
   "background_ridge": 10.0,
   "background_residual_mix": 0.5,
@@ -111,7 +111,7 @@
   "fine_tail_budget": 0.2,
   "local_margin_weight": 0.3,
   "fine_disagreement_weight": 0.06,
-  "v12": ".",
+  "background_source": ".",
   "final_reference_tail_budget": 0.15,
   "tranad_learning_rates": [
     0.0001,
@@ -124,7 +124,7 @@
   "activity_shrinkage_cases": 32.0,
   "activity_correction_cap_fraction": 0.5,
   "activity_min_relative_gain": 0.01,
-  "v13": ".",
+  "structured_source": ".",
   "masked_learning_rates": [
     0.0001,
     3e-05
@@ -142,16 +142,16 @@
   "policy_boundary_weight": 0.05,
   "policy_validation_sign_weight": 0.1,
   "policy_validation_route_weight": 1.0,
-  "v14": ".",
+  "masked_source": ".",
   "paper_reward_beta": 1.0,
   "paper_reward_lambda": 0.15,
   "paper_reward_scale_floor": 0.1,
   "high_return_definition": "binary projection of internal reward; conditional subtype reward stays low-level",
-  "v15": ".",
+  "reward_source": ".",
   "tail_evidence_weight": 0.25,
   "tail_evidence_shrinkage_cases": 32.0,
   "tail_evidence_scale_floor": 0.1,
-  "v16": ".",
+  "tail_source": ".",
   "arms": [
     "final"
   ],
@@ -200,13 +200,13 @@
     ]
   },
   "baseline_threshold": "training 3-means lower midpoint, or q95 when fewer than 3 distinct scores",
-  "v22": ".",
+  "representation_source": ".",
   "experiment": "Unified schema-driven nine-dataset protocol. The same timestamp-tie rule is applied to every log; each training split chooses activity+lifecycle tokens only when lifecycle coverage is complete and has at least two states, otherwise activity tokens. Vocabulary and fitting inputs come only from the training split, with identity fitting indices for every dataset. U-DHRL, rewards, clustering thresholds, models, budgets and evaluation remain unchanged; all six methods retrain from scratch.",
-  "v23": ".",
+  "paired_source": ".",
   "expected_jobs": 270,
   "parent": ".",
   "reference_roots": [],
-  "v25_reference": ".",
+  "protocol_reference": ".",
   "preprocessing_seed_offset": 24024,
   "preprocessing_rule": {
     "event_order": "Within the observed first 50 events, a same-timestamp group is stably sorted by action_code only when every event in that group has a nonempty action_code; otherwise source order is preserved.",

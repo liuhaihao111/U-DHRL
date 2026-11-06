@@ -7,7 +7,7 @@ normal false-positive rate. All fitting precedes benchmark evaluation.
 import pickle
 import numpy as np
 from common import CFG
-from representation import EvidenceV10, robust_fit, robust_apply, adaptive_thresholds
+from representation import ReconstructionEvidence, robust_fit, robust_apply, adaptive_thresholds
 
 
 def _width(a):
@@ -110,7 +110,7 @@ class _Background:
         return base + np.clip(adjusted - base, -self.correction_limit, self.correction_limit)
 
 
-class EvidenceV12:
+class BackgroundEvidence:
     """Different coarse/local pseudo-rewards, fitted on original held-out cases."""
     def _modes(self, p):
         z = robust_apply(p['latent'], self.compat.latent_fit)
@@ -131,7 +131,7 @@ class EvidenceV12:
         assert len(p_train['length']) >= 3 and len(p_reference['length']) >= 3
         # Retain dimensions/scalers of the original coarse policy's state.
         # Only training data identify latent modes and fixed length groups.
-        self.compat = EvidenceV10().fit(p_train, seed)
+        self.compat = ReconstructionEvidence().fit(p_train, seed)
         self.centers = self.compat.centers.copy()
         self.sigma = self.compat.sigma
         modes = self._modes(p_reference)
@@ -255,7 +255,7 @@ def selfcheck():
         return dict(latent=latent, length=length, event=event, entropy=entropy,
                     stats=stats, native=stats[:, 0])
     train, reference, query = pack(240), pack(90), pack(32)
-    teacher = EvidenceV12().fit(train, reference, 42)
+    teacher = BackgroundEvidence().fit(train, reference, 42)
     transformed = teacher.transform(query)
     clone = pickle.loads(pickle.dumps(teacher))
     for key, a in transformed.items():

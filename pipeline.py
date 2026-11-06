@@ -10,7 +10,7 @@ def prepare(raw,out,seed,cfg):
  import numpy as np
  from standalone_data import read_xes,encode as activity_encode,mutate
  from paired_data import coupled_mutate
- from preprocess_v24 import read_events,choose_representation,vocabulary,encode,replay
+ from preprocessing import read_events,choose_representation,vocabulary,encode,replay
  raw=Path(raw).resolve();cases=read_xes(raw);events=read_events(raw)
  rng=np.random.default_rng(seed);perm=rng.permutation(len(cases));nt=int(.7*len(cases));nv=int(.1*len(cases))
  parts={'train':perm[:nt],'validation':perm[nt:nt+nv//2],'calibration':perm[nt+nv//2:nt+nv],'test':perm[nt+nv:]}
@@ -77,14 +77,6 @@ def summarize(work):
   values=[v for k,v in seedmeans.items() if k[:2]==(ds,model)]
   records.append(dict(dataset=ds,model=model,n_seeds=len(values),binary_f1_mean=float(np.mean(values)),binary_f1_sd=float(np.std(values,ddof=1)) if len(values)>1 else None))
  write(dest/'binary_summary.json',records)
- # Native three-action predictions are diagnostic; they are NOT V30/V41 refined subtyping.
- from sklearn.metrics import f1_score,confusion_matrix
- diagnostics=[]
- for p in sorted((work/'results').glob('*/*/final/U-DHRL/test_*.npz')):
-  with np.load(p) as z:
-   if 'classes' not in z:continue
-   diagnostics.append(dict(dataset=p.parents[3].name,seed=int(p.parents[2].name),rate=int(p.stem.split('_')[1]),unsubtyped_anomalies=int((z['classes']<0).sum()),note='Native branch output; coarse anomalies may be unsubtyped. Not the manuscript V41 three-class metric.'))
- write(dest/'native_output_scope.json',diagnostics)
 
 def main():
  p=argparse.ArgumentParser(description=__doc__)
@@ -104,7 +96,7 @@ def main():
   if ds not in cfg['datasets']:p.error('Unknown dataset name: '+ds)
   if not Path(path).is_file():p.error('Missing raw log: '+path)
  if 'GRASPED' in a.models and not (ROOT/'vendor/guanwei49__GRASPED/model/GRU_AE.py').is_file():
-  p.error('GRASPED external implementation missing; see THIRD_PARTY.md. U-DHRL runs without it.')
+  p.error('GRASPED external implementation missing; see docs/THIRD_PARTY.md. U-DHRL runs without it.')
  work=a.output.resolve()
  if work.exists():p.error('Output already exists; use a new directory')
  work.mkdir(parents=True);shutil.copytree(ROOT/'src',work/'src')

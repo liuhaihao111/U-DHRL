@@ -64,7 +64,7 @@ def adaptive_thresholds(score,seed):
     assert score.ndim==1 and len(score)>0 and np.isfinite(score).all()
     old_x,old_y,centers=robust_thresholds(score,seed)
     info=dict(old_x=old_x,old_y=old_y,centers=centers,changed=False)
-    if centers is None:return old_x,old_y,dict(info,reason='degenerate_keep_v8')
+    if centers is None:return old_x,old_y,dict(info,reason='degenerate_keep_initial')
     c=np.asarray(centers);bounds=(c[:-1]+c[1:])/2
     clipped=np.clip(score,*np.quantile(score,CFG['teacher_winsor']))
     labels=np.searchsorted(bounds,clipped);counts=np.bincount(labels,minlength=3)
@@ -154,7 +154,7 @@ class Evidence:
 
     def rewards(self,score,goal):
         # Both branches share binary reward units. Fine action 0 can reverse a coarse anomaly.
-        # Smoothly compress large errors without V8's flat clipped reward tail.
+        # Smoothly compress large errors without initial's flat clipped reward tail.
         d=np.arcsinh((score-self.x)/self.reward_scale)
         r=np.column_stack((-d,d,d)).astype(np.float32)
         fine=goal==1;simple=score<self.y
@@ -209,10 +209,10 @@ def stable_thresholds(score, seed):
     return float(proposed), float(y), info
 
 
-class EvidenceV10(Evidence):
+class ReconstructionEvidence(Evidence):
     """Same VAE features and dimensions, with a bounded length-bias correction.
 
-    Keep Evidence unchanged so frozen V9 pickles retain exactly their original
+    Keep Evidence unchanged so frozen base pickles retain exactly their original
     transform and reward behavior for the reference evaluation.
     """
     def fit(self, p, seed):

@@ -1,13 +1,13 @@
 """Paper equations 9/11 with robust units and an explicit anomaly safety gate.
 
-V14's VAE, score correction, x/y and latent clusters are frozen. This wrapper
+masked's VAE, score correction, x/y and latent clusters are frozen. This wrapper
 changes rewards and exposes their global membership inputs, never test labels.
 """
 import copy
 import numpy as np
 import torch
 from common import CFG
-from evidence_v14 import EvidenceV14
+from evidence_masked import MaskedEvidence
 from representation import robust_apply
 from policy import to_tensor as legacy_to_tensor, teacher_inputs as legacy_teacher_inputs
 
@@ -36,9 +36,9 @@ def teacher_inputs(p, index):
     return result
 
 
-class EvidenceV15:
+class RewardEvidence:
     def fit(self, reference, train, validation, seed):
-        assert type(reference) is EvidenceV14
+        assert type(reference) is MaskedEvidence
         assert not any(k in p for p in (train, validation) for k in ('y', 'labels', 'y_three', 'test'))
         self.reference = reference
         self.mode = 'optimized'
@@ -54,7 +54,7 @@ class EvidenceV15:
         self.reward_diagnostics = dict(beta=self.beta, lambda_=self.lam,
             scale=self.reward_scale, scale_reference='original unlabeled validation Q90-Q10',
             internal_distance='beta * asinh((delta-boundary)/scale)',
-            delta='frozen V14 entropy-excess reconstruction margin; x=0; V14 y unchanged',
+            delta='frozen masked entropy-excess reconstruction margin; x=0; masked y unchanged',
             fine_reward='binary gate plus anomalous-only subtype utility minus its maximum',
             normal_fine_subtype_training=False, external='equation 9 with ambiguity-corrected min membership',
             high_return='same binary utility for both branches; subtype reward trains low-level only',

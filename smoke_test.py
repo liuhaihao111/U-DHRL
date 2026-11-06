@@ -17,5 +17,6 @@ def main():
  mapping=a.output/'logs.json';mapping.write_text(json.dumps({'BPIC13_C':str(raw.resolve())}))
  (a.output/'SYNTHETIC_ONLY.txt').write_text('Synthetic functional test. BPIC13_C is used solely as an accepted configuration key; these are not BPIC data or paper results.')
  subprocess.run([sys.executable,str(Path(__file__).with_name('pipeline.py')),'--logs',str(mapping),'--output',str(a.output/'run'),'--seeds','42','--models','U-DHRL','Naive','--device','cpu','--smoke'],check=True)
+ assert (a.output/'run'/'RUN_COMPLETE.json').is_file()
  print('Synthetic end-to-end smoke test passed.')
 if __name__=='__main__':main()

@@ -26,7 +26,7 @@ def code_manifest():
     files=list(ROOT.glob('*.py'))+list((ROOT/'src').glob('*.py'))+[ROOT/'config.json',ROOT/'PROTOCOL.md',ROOT/'plan.json']
     return {str(p.relative_to(ROOT)):sha(p) for p in sorted(files)}
 def verify(ds=None,seed=None):
-    f=json.loads((ROOT/'frozen.json').read_text());assert f['code']==code_manifest(),'Frozen V26 code changed'
+    f=json.loads((ROOT/'frozen.json').read_text());assert f['code']==code_manifest(),'Frozen unified code changed'
     for p,h in f['vendor'].items():assert sha(p)==h,p
     if ds:
         for p,h in f['inputs'][ds+'/'+str(seed)].items():assert sha(p)==h,p

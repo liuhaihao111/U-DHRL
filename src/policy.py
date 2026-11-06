@@ -8,8 +8,8 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from common import CFG,seed_all,fingerprint,write
 
 def hierarchical(variant):
-    # Legacy names are inference-only frozen references. New fitting uses V13.
-    return variant in ('U-DHRL-V13','U-DHRL-V12','U-DHRL-V11','U-DHRL-V10')
+    # Legacy names are inference-only frozen references. New fitting uses structured.
+    return variant in ('U-DHRL-Structured','U-DHRL-Background','U-DHRL-Calibrated','U-DHRL-Reconstruction')
 
 def mask_q(q,goal):
     allowed=torch.ones_like(q,dtype=torch.bool);allowed[goal==0,2]=False
@@ -107,8 +107,8 @@ def validation_objective(agent,p,teacher):
 
 def train_policy(train,val,teacher,seed,device,variant,out,epochs=None,warm_path=None):
     best=float('inf');chosen=None;history=[];max_epochs=epochs or CFG['policy_epochs'];attempted_low=0;attempted_high=0
-    assert variant in CFG['policies'], 'Frozen references cannot be fitted by V13'
-    assert warm_path is None or CFG['warm_start'], 'V13 defaults to fresh, equal-budget policy fitting'
+    assert variant in CFG['policies'], 'Frozen references cannot be fitted by structured'
+    assert warm_path is None or CFG['warm_start'], 'structured defaults to fresh, equal-budget policy fitting'
     assert all(k in p for p in (train,val) for k in ('coarse_margin','fine_margin'))
     initial=torch.load(warm_path,map_location='cpu') if warm_path is not None else None
     def snapshot(agent,row,before):

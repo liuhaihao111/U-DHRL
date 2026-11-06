@@ -6,21 +6,21 @@ from common import ROOT,CFG,write,sha,verify,seed_all,development_inputs,fit_inp
 from native_models import VAE
 from context_vae import ContextVAE
 from masked_vae import MaskedContextVAE
-from retrain_v22 import retrain
-from evidence_v14 import EvidenceV14
-from evidence_v15 import EvidenceV15
-from evidence_v16 import EvidenceV16
-from tail_v16 import extract_tail_views
-from policy_v16 import Agent,train_policy,load_policy_weights
+from representation_training import retrain
+from evidence_masked import MaskedEvidence
+from evidence_reward import RewardEvidence
+from evidence_tail import TailEvidence
+from tail_features import extract_tail_views
+from policy_hierarchical import Agent,train_policy,load_policy_weights
 import baseline_fit
 
-POLICY='U-DHRL-V16'
+POLICY='U-DHRL'
 def folder(stage,ds,seed,arm,model):return ROOT/stage/ds/str(seed)/arm/model
 def artifact_hashes(out):return {p.name:sha(p) for p in sorted(out.iterdir()) if p.is_file() and p.name!='COMPLETE.json'}
 def refit(packs,seed,enabled):
-    e=EvidenceV14().fit(packs['train'],packs['validation'],seed,enabled)
-    e=EvidenceV15().fit(e,packs['train'],packs['validation'],seed)
-    return EvidenceV16().fit(e,packs['train'],packs['validation'],seed)
+    e=MaskedEvidence().fit(packs['train'],packs['validation'],seed,enabled)
+    e=RewardEvidence().fit(e,packs['train'],packs['validation'],seed)
+    return TailEvidence().fit(e,packs['train'],packs['validation'],seed)
 def load_ours(vocab,out,device):
     # Full checkpoint load; no historical VAE or test-dependent fit is used.
     vae=MaskedContextVAE(ContextVAE(VAE(vocab,52),vocab)).to(device)
