@@ -71,7 +71,7 @@ The core VAE, calibrated evidence, rewards, low-level action sets and policy tra
 
 No claim of bitwise agreement with the original paper results is made without running the full experiment on the same raw log versions and numerical environment. Raw-log SHA256, splits, recipes and configuration are written for each new run. A successful smoke test validates execution, not the reported performance.
 
-This release covers the main binary-detection workflow and the original on-demand inference implementation. It does not include the later V30/V41 severity-refinement experiments, sensitivity or ablation studies. Native coarse-branch anomalies can remain unsubtyped; they must not be presented as the paper's V41 three-class predictions. This scope is explicit rather than leaving hidden dependencies on inaccessible old weights.
+The main experiment compares U-DHRL with five baselines on case-level binary detection. All methods use the same evaluation rule: normal cases form the negative class, and cases with an injected control-flow anomaly form the positive class.
 
 SOURCE_MANIFEST.json records the provenance of the core files. src/standalone_data.py is new integration code calling only archive helpers. Historical recipe equality is not claimed. Some retained utility functions refer to historical paths but are not called by pipeline.py; the standalone entry point constructs all inputs it uses. See VALIDATION.md for checks actually performed.
 
